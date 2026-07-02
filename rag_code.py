@@ -69,7 +69,7 @@ class QdrantVDB:
                                                                                        indexing_threshold=0)
                                          )
             
-    def ingest_data():
+    def ingest_data(self, embeddata):
 
         for batch_context, batch_embeddings in tqdm(zip(batch_iterate(embeddata.contexts, self.batch_size), 
                                                         batch_iterate(embeddata.embeddings, self.batch_size)), 
