@@ -1,0 +1,4 @@
+llama-index-embeddings-huggingface
+tqdm
+qdrant-client
+fastmcp

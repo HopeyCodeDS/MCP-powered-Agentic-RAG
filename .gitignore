@@ -1,0 +1,4 @@
+.venv/
+env
+.env
+mcp.json
