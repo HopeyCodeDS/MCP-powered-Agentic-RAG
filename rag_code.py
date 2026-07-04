@@ -3,7 +3,20 @@ from tqdm import tqdm
 from qdrant_client import models
 from qdrant_client import QdrantClient
 
-faq_text = """
+faq_text = """Question 1: What is the first step before building a machine learning model?
+Answer 1: Understand the problem, define the objective, and identify the right metrics for evaluation.
+
+Question 2: How important is data cleaning in ML?
+Answer 2: Extremely important. Clean data improves model performance and reduces the chance of misleading results.
+
+Question 3: Should I normalize or standardize my data?
+Answer 3: Yes, especially for models sensitive to feature scales like SVMs, KNN, and neural networks.
+
+Question 4: When should I use feature engineering?
+Answer 4: Always consider it. Well-crafted features often yield better results than complex models.
+
+Question 5: How to handle missing values?
+Answer 5: Use imputation techniques like mean/median imputation, or model-based imputation depending on the context.
 
 
 """
@@ -35,7 +48,7 @@ class EmbedData():
     def embed(self, contexts):
         self.contexts = contexts
 
-        for batch_content in tqdm(batch_iterate(contexts, self.batch_size),
+        for batch_context in tqdm(batch_iterate(contexts, self.batch_size),
                                   total=len(contexts)//self.batch_size,
                                   desc="Embedding data in batches"):
             
