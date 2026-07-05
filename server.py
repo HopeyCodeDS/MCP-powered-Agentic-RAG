@@ -76,10 +76,10 @@ def tavily_web_search_tool(query: str) -> list[str]:
     for result in response.get("results", []):
         context.append(
             f"""
-Title: {result.get('title', '')}
-URL: {result.get('url', '')}
-Content: {result.get('content', '')}
-""".strip()
+                Title: {result.get('title', '')}
+                URL: {result.get('url', '')}
+                Content: {result.get('content', '')}
+            """.strip()
         )
 
     return context
