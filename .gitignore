@@ -2,3 +2,7 @@
 env
 .env
 mcp.json
+__pycache__/
+hf_cache/
+qdrant_storage/
+
