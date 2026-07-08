@@ -2,14 +2,14 @@ from mcp.server.fastmcp import FastMCP
 from rag_code import *
 from tavily import TavilyClient
 import os
+from dotenv import load_dotenv
 
 load_dotenv()
 
 # Create a MCP server instance
-mcp = FastMCP("rag_server",
+mcp = FastMCP("mcp-rag-server",
               host="0.0.0.0",
-              port=8000,
-              timeout=30)
+              port=8000)
 
 
 @mcp.tool()
@@ -83,3 +83,9 @@ def tavily_web_search_tool(query: str) -> list[str]:
         )
 
     return context
+
+
+
+if __name__ == "__main__":
+    print("Starting MCP server at http://127.0.0.1:8080 on port 8080")
+    mcp.run()

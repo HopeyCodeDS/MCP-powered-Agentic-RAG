@@ -18,7 +18,50 @@ Answer 4: Always consider it. Well-crafted features often yield better results t
 Question 5: How to handle missing values?
 Answer 5: Use imputation techniques like mean/median imputation, or model-based imputation depending on the context.
 
+Question 6: Should I balance my dataset for classification tasks?
+Answer 6: Yes, especially if the classes are imbalanced. Techniques include resampling, SMOTE, and class-weighting.
 
+Question 7: How do I select features for my model?
+Answer 7: Use domain knowledge, correlation analysis, or techniques like Recursive Feature Elimination or SHAP values.
+
+Question 8: Is it good to use all features available?
+Answer 8: Not always. Irrelevant or redundant features can reduce performance and increase overfitting.
+
+Question 9: How do I avoid overfitting?
+Answer 9: Use techniques like cross-validation, regularization, pruning (for trees), and dropout (for neural nets).
+
+Question 10: Why is cross-validation important?
+Answer 10: It provides a more reliable estimate of model performance by reducing bias from a single train-test split.
+
+Question 11: What’s a good train-test split ratio?
+Answer 11: Common ratios are 80/20 or 70/30, but use cross-validation for more robust evaluation.
+
+Question 12: Should I tune hyperparameters?
+Answer 12: Yes. Use grid search, random search, or Bayesian optimization to improve model performance.
+
+Question 13: What’s the difference between training and validation sets?
+Answer 13: Training set trains the model, validation set tunes hyperparameters, and test set evaluates final performance.
+
+Question 14: How do I know if my model is underfitting?
+Answer 14: It performs poorly on both training and test sets, indicating it hasn’t learned patterns well.
+
+Question 15: What are signs of overfitting?
+Answer 15: High accuracy on training data but poor generalization to test or validation data.
+
+Question 16: Is ensemble modeling useful?
+Answer 16: Yes. Ensembles like Random Forests or Gradient Boosting often outperform individual models.
+
+Question 17: When should I use deep learning?
+Answer 17: Use it when you have large datasets, complex patterns, or tasks like image and text processing.
+
+Question 18: What is data leakage and how to avoid it?
+Answer 18: Data leakage is using future or target-related information during training. Avoid by carefully splitting and preprocessing.
+
+Question 19: How do I measure model performance?
+Answer 19: Choose appropriate metrics: accuracy, precision, recall, F1, ROC-AUC for classification; RMSE, MAE for regression.
+
+Question 20: Why is model interpretability important?
+Answer 20: It builds trust, helps debug, and ensures compliance—especially important in high-stakes domains like healthcare.
 """
 
 new_faq_text = [i.replace("\n", " ") for i in faq_text.split("\n\n")]
@@ -66,7 +109,7 @@ class QdrantVDB:
         self.define_client()
 
     def define_client(self):
-        self.client = QdrantClient(url="http://localhost:6333",
+        self.client = QdrantClient(url="http://host.docker.internal:6333",
                                    prefer_grpc=True)
         
     def create_collection(self):
@@ -107,12 +150,9 @@ class Retriever:
     def search(self, query):
         query_embedding = self.embeddata.embed_model.get_query_embedding(query)
 
-        # select the top 3 results
-        result = self.vector_db.client.search(
+        result = self.vector_db.client.query_points(
             collection_name=self.vector_db.collection_name,
-
-            query_vector=query_embedding,
-
+            query=query_embedding,
             search_params=models.SearchParams(
                 quantization=models.QuantizationSearchParams(
                     ignore=True,
@@ -124,13 +164,10 @@ class Retriever:
             timeout=1000,
         )
 
-        content = [dict(data) for data in result]
         combined_prompt = []
 
-        for entry in context[:3]:
-            context = entry["payload"]["context"]
-
-            combined_prompt.append(context)
+        for point in result.points:
+            combined_prompt.append(point.payload["context"])
         
         final_output = "\n\n---\n\n".join(combined_prompt)
         return final_output
