@@ -1,15 +1,14 @@
+import os
+import sys
 from mcp.server.fastmcp import FastMCP
 from rag_code import *
 from tavily import TavilyClient
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Create a MCP server instance
-mcp = FastMCP("mcp-rag-server",
-              host="0.0.0.0",
-              port=8000)
+# Create a clean Stdio-compatible FastMCP server instance
+mcp = FastMCP("mcp-rag-server")
 
 
 @mcp.tool()
