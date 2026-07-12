@@ -10,6 +10,11 @@ load_dotenv()
 # Create a clean Stdio-compatible FastMCP server instance
 mcp = FastMCP("mcp-rag-server")
 
+# Instantiate the Retriever ONCE gloabally so the heavy embedding model
+# is loaded only once and not on every request.
+print("Initializing local RAG Embedding structures...", file=sys.stderr)
+GLOBAL_RETRIEVER = Retriever(QdrantVDB("ml_faq_collection"), EmbedData())
+
 
 @mcp.tool()
 def machine_learning_faq_retrieval_tool(query: str) -> str:
@@ -26,10 +31,8 @@ def machine_learning_faq_retrieval_tool(query: str) -> str:
     # check type of text
     if not isinstance(query, str):
         raise ValueError("query must be a string")
-    
-    retriever = Retriever(QdrantVDB("ml_faq_collection"), EmbedData())
-    response = retriever.search(query)
-
+    # Use the warm global retriever instance
+    response = GLOBAL_RETRIEVER.search(query)
     return response
 
 
@@ -86,5 +89,6 @@ def tavily_web_search_tool(query: str) -> list[str]:
 
 
 if __name__ == "__main__":
-    print("Starting MCP server at http://127.0.0.1:8080 on port 8080")
+    # Standard log messages MUST go to sys.stderr to protect the stdout stream for MCP communication.
+    print("Starting Stdio MCP pipe connector...", file=sys.stderr)
     mcp.run()
